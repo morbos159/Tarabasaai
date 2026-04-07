@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaraBasa AI - Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">📚 TaraBasa AI</div>
+      <div class="tagline">🌟 Complete AI-Powered Learning Platform 🌟</div>
+    </div>
+
+    <div id="teacher-dashboard" class="screen">
+      <h2>Teacher Dashboard 👩‍🏫</h2>
+      <div class="dashboard-grid">
+        <div class="stat-card" style="background: var(--success-green); cursor:pointer;" onclick="toggleStudentPanel()">
+          <div class="stat-number" id="total-students-number">0</div>
+          <div class="stat-label">Total Students (Click)</div>
+        </div>
+        <div class="stat-card" style="background: var(--warning-orange);">
+          <div class="stat-number" id="need-help-number">0</div>
+          <div class="stat-label">Need Help</div>
+        </div>
+        <div class="stat-card" style="background: var(--info-blue);">
+          <div class="stat-number" id="class-average-number">0%</div>
+          <div class="stat-label">Class Average</div>
+        </div>
+        <div class="stat-card" style="background: var(--primary-pink);">
+          <div class="stat-number" id="on-track-number">0</div>
+          <div class="stat-label">On Track</div>
+        </div>
+      </div>
+
+      <div class="notification"><strong>⚠️ Intervention Needed:</strong> Students below 75% should get support.</div>
+      <div class="panel" id="students-panel">
+        <h3>Class List</h3>
+        <div id="student-list-container"></div>
+      </div>
+      <div class="panel" id="report-box" style="display:none;">
+        <h3>Generated Report</h3>
+        <div id="report-content"></div>
+      </div>
+
+      <div style="text-align:center;">
+        <button class="btn btn-primary" onclick="generateReport()">📊 Generate Reports</button>
+        <button class="btn btn-success" onclick="addStudent()">➕ Add Student</button>
+        <button class="back-btn" onclick="logoutUser()">← Logout</button>
+      </div>
+    </div>
+
+    <div id="student-home" class="screen">
+      <h2>Student Dashboard 🎉</h2>
+      <div class="module-grid">
+        <div class="module-card">📖 Read Story</div>
+        <div class="module-card">🔤 Letter Sounds</div>
+        <div class="module-card">🧠 Thinking Games</div>
+      </div>
+      <div style="text-align:center; margin-top:20px;">
+        <button class="back-btn" onclick="logoutUser()">← Logout</button>
+      </div>
+    </div>
+
+    <div id="parent-dashboard" class="screen">
+      <h2>Parent Dashboard 👪</h2>
+      <div class="notification">Track your child's weekly reading progress and activity completion.</div>
+      <div style="text-align:center; margin-top:20px;">
+        <button class="back-btn" onclick="logoutUser()">← Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app-data.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
