@@ -1,0 +1,20 @@
+window.addEventListener("DOMContentLoaded", async () => {
+  const session = await getSession();
+  if (!session || !session.role) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  showRoleDashboard(session.role);
+  if (session.role === "teacher") {
+    await renderClassOverview();
+    await renderStudentList();
+    await refreshProgressTracking();
+    initTeacherRealtimeDashboard();
+  } else if (session.role === "parent") {
+    await renderParentDashboard();
+  } else if (session.role === "student") {
+    await initActionVerbLibrary();
+    await refreshProgressTracking();
+  }
+});

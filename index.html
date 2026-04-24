@@ -27,6 +27,9 @@
           <label>Password</label>
           <input class="auth-input" id="login-password" type="password" required placeholder="Enter password">
           <button class="btn btn-primary" type="submit" style="width:100%;">Login</button>
+          <button class="back-btn" type="button" style="width:100%; margin-top:8px;" onclick="handleForgotPassword()">
+            Forgot Password
+          </button>
         </form>
 
         <form id="signup-form" class="auth-form" onsubmit="handleSignup(event)">
@@ -50,6 +53,8 @@
   </div>
 
   <script src="js/app-data.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/features/auth-ui.js"></script>
+  <script src="js/features/auth-actions.js"></script>
+  <script src="js/features/auth-init.js"></script>
 </body>
 </html>

@@ -22,21 +22,45 @@
         </div>
         <div class="stat-card" style="background: var(--warning-orange);">
           <div class="stat-number" id="need-help-number">0</div>
-          <div class="stat-label">Need Help</div>
+          <div class="stat-label">At-Risk</div>
         </div>
         <div class="stat-card" style="background: var(--info-blue);">
           <div class="stat-number" id="class-average-number">0%</div>
           <div class="stat-label">Class Average</div>
         </div>
         <div class="stat-card" style="background: var(--primary-pink);">
-          <div class="stat-number" id="on-track-number">0</div>
-          <div class="stat-label">On Track</div>
+          <div class="stat-number" id="active-today-number">0</div>
+          <div class="stat-label">Active Today</div>
         </div>
       </div>
 
-      <div class="notification"><strong>⚠️ Intervention Needed:</strong> Students below 75% should get support.</div>
+      <div class="notification" id="alert-panel"><strong>⚠️ Intervention Needed:</strong> Students below 75% should get support.</div>
+      <div class="panel">
+        <h3>Live Voice Attempt History (Teacher Feed)</h3>
+        <div id="teacher-badge-board" class="badge-board"></div>
+        <div id="teacher-history-feed"></div>
+        <div id="teacher-trend-chart"></div>
+      </div>
       <div class="panel" id="students-panel">
         <h3>Class List</h3>
+        <div class="toolbar-row">
+          <input id="student-search-input" class="auth-input compact-input" type="text" placeholder="Search student/parent">
+          <select id="grade-filter-select" class="auth-select compact-input">
+            <option value="">All Grades</option>
+            <option value="1">Grade 1</option>
+            <option value="2">Grade 2</option>
+            <option value="3">Grade 3</option>
+            <option value="4">Grade 4</option>
+            <option value="5">Grade 5</option>
+            <option value="6">Grade 6</option>
+          </select>
+          <select id="risk-filter-select" class="auth-select compact-input">
+            <option value="">All Status</option>
+            <option value="true">At Risk</option>
+            <option value="false">On Track</option>
+          </select>
+          <button class="btn btn-info" onclick="renderStudentList()">Apply</button>
+        </div>
         <div id="student-list-container"></div>
       </div>
       <div class="panel" id="report-box" style="display:none;">
@@ -47,16 +71,38 @@
       <div style="text-align:center;">
         <button class="btn btn-primary" onclick="generateReport()">📊 Generate Reports</button>
         <button class="btn btn-success" onclick="addStudent()">➕ Add Student</button>
+        <button class="btn btn-warning" onclick="importCsvStudents()">📥 Import CSV</button>
         <button class="back-btn" onclick="logoutUser()">← Logout</button>
       </div>
     </div>
 
     <div id="student-home" class="screen">
       <h2>Student Dashboard 🎉</h2>
-      <div class="module-grid">
-        <div class="module-card">📖 Read Story</div>
-        <div class="module-card">🔤 Letter Sounds</div>
-        <div class="module-card">🧠 Thinking Games</div>
+      <div class="panel">
+        <h3>Action Verb Library & Lesson Cards</h3>
+        <div id="tense-selector" style="margin-bottom: 12px;"></div>
+        <div class="notification" id="selected-verb-label">Target: Select a verb card.</div>
+        <div class="verb-grid" id="verb-library-grid"></div>
+      </div>
+      <div class="panel">
+        <h3>AI Voice Recording & Pronunciation Validator</h3>
+        <div class="notification" id="ai-live-status">Select a target verb and press Start Recording.</div>
+        <div style="text-align:center;">
+          <button class="btn btn-success" onclick="startVoiceValidation()">🎙️ Start Recording</button>
+          <button class="btn btn-warning" onclick="stopVoiceValidation()">⏹️ Stop</button>
+        </div>
+        <div class="dashboard-grid">
+          <div class="stat-card"><div class="stat-number" id="ai-score-pronunciation">0</div><div class="stat-label">Pronunciation</div></div>
+          <div class="stat-card"><div class="stat-number" id="ai-score-fluency">0</div><div class="stat-label">Fluency</div></div>
+          <div class="stat-card"><div class="stat-number" id="ai-score-accuracy">0</div><div class="stat-label">Accuracy</div></div>
+          <div class="stat-card"><div class="stat-number" id="ai-score-overall">0</div><div class="stat-label">Overall</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>User History & Progress Tracking</h3>
+        <div id="student-badge-board" class="badge-board"></div>
+        <div id="student-history-feed"></div>
+        <div id="student-trend-chart"></div>
       </div>
       <div style="text-align:center; margin-top:20px;">
         <button class="back-btn" onclick="logoutUser()">← Logout</button>
@@ -66,6 +112,22 @@
     <div id="parent-dashboard" class="screen">
       <h2>Parent Dashboard 👪</h2>
       <div class="notification">Track your child's weekly reading progress and activity completion.</div>
+      <div class="panel">
+        <h3>Child Summary Cards</h3>
+        <div class="module-grid" id="parent-summary-cards"></div>
+      </div>
+      <div class="panel">
+        <h3>Weekly Report</h3>
+        <div id="weekly-report-content"></div>
+      </div>
+      <div class="panel">
+        <h3>Activity Checklist</h3>
+        <div id="activity-checklist"></div>
+      </div>
+      <div class="panel">
+        <h3>Badge Display</h3>
+        <div id="badge-display"></div>
+      </div>
       <div style="text-align:center; margin-top:20px;">
         <button class="back-btn" onclick="logoutUser()">← Logout</button>
       </div>
@@ -73,6 +135,13 @@
   </div>
 
   <script src="js/app-data.js"></script>
-  <script src="js/dashboard.js"></script>
+  <script src="js/features/dashboard-routing.js"></script>
+  <script src="js/features/action-verb-library.js"></script>
+  <script src="js/features/ai-pronunciation-validator.js"></script>
+  <script src="js/features/progress-history.js"></script>
+  <script src="js/features/realtime-teacher-dashboard.js"></script>
+  <script src="js/features/teacher-dashboard.js"></script>
+  <script src="js/features/parent-dashboard.js"></script>
+  <script src="js/features/dashboard-init.js"></script>
 </body>
 </html>

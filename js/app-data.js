@@ -1,9 +1,21 @@
-function getUsers() {
-  return JSON.parse(localStorage.getItem("tb_users") || "[]");
-}
+const API_BASE = "";
 
-function saveUsers(users) {
-  localStorage.setItem("tb_users", JSON.stringify(users));
+async function apiRequest(path, options = {}) {
+  const session = JSON.parse(localStorage.getItem("tb_session") || "null");
+  const incomingHeaders = options.headers || {};
+  const response = await fetch(`${API_BASE}${path}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...incomingHeaders,
+      ...(session?.email ? { "x-user-email": session.email } : {})
+    },
+    ...options
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.error || "Request failed.");
+  }
+  return response.status === 204 ? null : response.json();
 }
 
 function setSession(user) {
@@ -14,31 +26,107 @@ function setSession(user) {
   }));
 }
 
-function getSession() {
-  return JSON.parse(localStorage.getItem("tb_session") || "null");
+async function getSession() {
+  const localSession = JSON.parse(localStorage.getItem("tb_session") || "null");
+  if (!localSession || !localSession.email) return null;
+  try {
+    return await apiRequest(`/api/session?email=${encodeURIComponent(localSession.email)}`);
+  } catch (_) {
+    clearSession();
+    return null;
+  }
 }
 
 function clearSession() {
   localStorage.removeItem("tb_session");
 }
 
-function getTeacherStudents() {
-  const fallback = [
-    { name: "Juan Dela Cruz", needsHelp: false, score: 86 },
-    { name: "Maria Reyes", needsHelp: true, score: 62 },
-    { name: "Pedro Garcia", needsHelp: false, score: 93 }
-  ];
-
-  const saved = JSON.parse(localStorage.getItem("tb_teacher_students") || "null");
-  if (!saved) return fallback;
-  if (Array.isArray(saved) && saved.length && typeof saved[0] === "string") {
-    const migrated = saved.map((name) => ({ name, needsHelp: false, score: 80 }));
-    localStorage.setItem("tb_teacher_students", JSON.stringify(migrated));
-    return migrated;
-  }
-  return saved;
+async function signupUser(user) {
+  return apiRequest("/api/signup", {
+    method: "POST",
+    body: JSON.stringify(user)
+  });
 }
 
-function saveTeacherStudents(students) {
-  localStorage.setItem("tb_teacher_students", JSON.stringify(students));
+async function loginUser(email, password) {
+  return apiRequest("/api/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password })
+  });
+}
+
+async function requestPasswordReset(email) {
+  return apiRequest("/api/password-reset/request", {
+    method: "POST",
+    body: JSON.stringify({ email })
+  });
+}
+
+async function confirmPasswordReset(email, token, newPassword) {
+  return apiRequest("/api/password-reset/confirm", {
+    method: "POST",
+    body: JSON.stringify({ email, token, newPassword })
+  });
+}
+
+async function getTeacherStudents() {
+  return apiRequest("/api/teacher-students");
+}
+
+async function addTeacherStudent(student) {
+  return apiRequest("/api/teacher-students", {
+    method: "POST",
+    body: JSON.stringify(student)
+  });
+}
+
+async function updateTeacherStudent(id, student) {
+  return apiRequest(`/api/teacher-students/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(student)
+  });
+}
+
+async function deleteTeacherStudent(id) {
+  return apiRequest(`/api/teacher-students/${id}`, {
+    method: "DELETE"
+  });
+}
+
+async function importTeacherStudentsCsv(csv) {
+  return apiRequest("/api/teacher-students/import-csv", {
+    method: "POST",
+    body: JSON.stringify({ csv })
+  });
+}
+
+async function getTeacherClassOverview() {
+  return apiRequest("/api/teacher/overview");
+}
+
+async function getParentOverview() {
+  return apiRequest("/api/parent/overview");
+}
+
+async function getActionVerbCards() {
+  return apiRequest("/api/action-verbs");
+}
+
+async function saveVoiceAttempt(attempt) {
+  return apiRequest("/api/voice-attempts", {
+    method: "POST",
+    body: JSON.stringify(attempt)
+  });
+}
+
+async function getStudentVoiceAttempts() {
+  return apiRequest("/api/voice-attempts/student");
+}
+
+async function getTeacherVoiceAttempts() {
+  return apiRequest("/api/voice-attempts/teacher");
+}
+
+async function getTeacherAtRiskAlerts() {
+  return apiRequest("/api/teacher/at-risk-alerts");
 }
